@@ -12,6 +12,7 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.validation.Valid;
 
 @RestController
 @RequestMapping( "/api/auth")
@@ -21,7 +22,7 @@ public class AuthenticationController {
 
 
     @PostMapping("/sign_in")
-    public ResponseEntity<?> signIn(@RequestBody @Validated SignInRequest signInRequest, HttpServletRequest request) {
+    public ResponseEntity<?> signIn(@RequestBody @Valid SignInRequest signInRequest, HttpServletRequest request) {
         return userService.signIn(signInRequest,request);
     }
 

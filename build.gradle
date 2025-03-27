@@ -12,6 +12,9 @@ java {
 		languageVersion = JavaLanguageVersion.of(17)
 	}
 }
+ext{
+	mapstructVersion = '1.5.1.Final'
+}
 
 repositories {
 	mavenCentral()
@@ -22,10 +25,16 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-web'
 	implementation 'org.springframework.boot:spring-boot-starter-security'
 	implementation 'io.jsonwebtoken:jjwt-api:0.11.1'
+	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'io.jsonwebtoken:jjwt-impl:0.11.1'
 	implementation 'io.jsonwebtoken:jjwt-jackson:0.11.1'
+	implementation "org.mapstruct:mapstruct:${mapstructVersion}"
 	compileOnly 'org.projectlombok:lombok:1.18.34'
+	annotationProcessor 'org.projectlombok:lombok-mapstruct-binding:0.2.0'
+	annotationProcessor "org.mapstruct:mapstruct-processor:${mapstructVersion}"
 	annotationProcessor 'org.projectlombok:lombok:1.18.34'
+	implementation 'org.springdoc:springdoc-openapi-ui:1.6.15'
+
 	implementation 'org.springframework.boot:spring-boot-starter-data-jpa'
 	runtimeOnly 'org.postgresql:postgresql'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'

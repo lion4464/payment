@@ -1,18 +1,19 @@
 package com.rustambek.payment.dto.auth;
 
-import com.sun.istack.NotNull;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
+
+import javax.validation.constraints.NotNull;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
 public class SignInRequest {
-    @NotNull
+    @NotNull(message = "username required")
     private String username;
-    @NotNull
+    @NotNull(message = "password required")
     private String password;
 }
