@@ -21,6 +21,8 @@ This project is a RESTful API service designed for transaction management.
 
 ## 🐘 PostgreSQL SQL script
 ```sql
+CREATE DATABASE test_transaction;
+
 CREATE SEQUENCE transactions_generate_number_seq START 1;
 
 CREATE TABLE transactions (
