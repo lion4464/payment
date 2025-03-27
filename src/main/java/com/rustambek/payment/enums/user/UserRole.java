@@ -1,4 +1,4 @@
-package com.rustambek.payment.model.user;
+package com.rustambek.payment.enums.user;
 
 public enum UserRole {
     ADMIN,

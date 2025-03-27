@@ -1,5 +1,6 @@
 package com.rustambek.payment.model.user;
 
+import com.rustambek.payment.enums.user.UserRole;
 import com.rustambek.payment.generic.GenericAuditingEntity;
 import lombok.AllArgsConstructor;
 import lombok.Builder;

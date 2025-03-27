@@ -1,5 +1,6 @@
 package com.rustambek.payment.exception;
 
+import com.rustambek.payment.utils.ErrorMessageUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.http.HttpStatus;
@@ -63,7 +64,7 @@ public class GlobalExceptionHandler {
                             HttpStatus.SERVICE_UNAVAILABLE.value(),
                             exception.getClass().getSimpleName(),
                             request.getRequest().getRequestURI(),
-                            exception.getMessage(),
+                            ErrorMessageUtil.getErrorMessage(exception),
                             new Date())
                     );
              }
@@ -76,7 +77,7 @@ public class GlobalExceptionHandler {
                             HttpStatus.EXPECTATION_FAILED.value(),
                             exception.getClass().getSimpleName(),
                             request.getRequest().getRequestURI(),
-                            exception.getMessage(),
+                            ErrorMessageUtil.getErrorMessage(exception),
                             new Date())
                     );
               } else
@@ -86,7 +87,7 @@ public class GlobalExceptionHandler {
                             HttpStatus.INTERNAL_SERVER_ERROR.value(),
                             exception.getClass().getSimpleName(),
                             request.getRequest().getRequestURI(),
-                            exception.getMessage(),
+                            ErrorMessageUtil.getErrorMessage(exception),
                             new Date())
                     );
              }

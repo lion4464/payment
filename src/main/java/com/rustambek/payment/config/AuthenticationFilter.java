@@ -4,7 +4,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.rustambek.payment.exception.ApiException;
 import com.rustambek.payment.exception.ErrorResponse;
 import com.rustambek.payment.model.user.User;
-import com.rustambek.payment.service.user.UserService;
+import com.rustambek.payment.service.user.UserServiceIml;
 import com.rustambek.payment.utils.ErrorMessageUtil;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -27,7 +27,7 @@ import java.io.PrintWriter;
 @RequiredArgsConstructor
 public class AuthenticationFilter extends OncePerRequestFilter {
 
-    private final UserService userService;
+    private final UserServiceIml userService;
 
     private final TokenUtil tokenUtil;
 

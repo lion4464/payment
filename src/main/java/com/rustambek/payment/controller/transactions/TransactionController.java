@@ -4,7 +4,6 @@ import com.rustambek.payment.dto.transactions.TransactionRequest;
 import com.rustambek.payment.service.transactions.TransactionService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
-import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.ResponseEntity;

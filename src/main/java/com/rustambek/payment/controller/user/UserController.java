@@ -1,7 +1,6 @@
 package com.rustambek.payment.controller.user;
 
 import com.rustambek.payment.dto.auth.SignUpRequest;
-import com.rustambek.payment.dto.transactions.TransactionRequest;
 import com.rustambek.payment.service.user.UserService;
 import io.swagger.v3.oas.annotations.security.SecurityRequirement;
 import lombok.RequiredArgsConstructor;
@@ -9,7 +8,6 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.validation.Valid;
 import java.util.UUID;
 
@@ -21,8 +19,8 @@ public class UserController {
     private final UserService userService;
 
     @PostMapping
-    public ResponseEntity<?> create(@Valid @RequestBody SignUpRequest requestDto, HttpServletRequest request) {
-        return userService.create(requestDto, request);
+    public ResponseEntity<?> create(@Valid @RequestBody SignUpRequest requestDto) {
+        return userService.create(requestDto);
     }
     @GetMapping("/{id}")
     public ResponseEntity<?> get(@PathVariable UUID id) {

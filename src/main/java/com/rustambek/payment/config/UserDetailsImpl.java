@@ -2,7 +2,7 @@ package com.rustambek.payment.config;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.rustambek.payment.model.user.User;
-import com.rustambek.payment.model.user.UserRole;
+import com.rustambek.payment.enums.user.UserRole;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;

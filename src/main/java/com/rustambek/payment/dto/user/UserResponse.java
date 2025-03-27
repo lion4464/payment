@@ -1,6 +1,6 @@
 package com.rustambek.payment.dto.user;
 
-import com.rustambek.payment.model.user.UserRole;
+import com.rustambek.payment.enums.user.UserRole;
 import lombok.*;
 
 @Data
