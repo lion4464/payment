@@ -73,6 +73,16 @@ CREATE UNIQUE INDEX idx_users_username ON users USING btree (username);
 
 ```
 
+## Chage application db configuration
+  src/resources/application.properties
+
+     spring.datasource.url=jdbc:postgresql://127.0.0.1:5432/test_transaction
+         spring.datasource.username=postgres
+         spring.datasource.password=root
+
+
+
+
 ## ✅ Build the Application
 
 First, package the application into a JAR file using Gradle
