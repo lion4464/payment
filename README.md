@@ -83,12 +83,6 @@ CREATE UNIQUE INDEX idx_users_username ON users USING btree (username);
 
 
 
-## ✅ Build the Application
-
-First, package the application into a JAR file using Gradle
-
-```./gradlew build```
-
 ### 🐳 Build Docker Image
 ```docker image build -t app .```
 
