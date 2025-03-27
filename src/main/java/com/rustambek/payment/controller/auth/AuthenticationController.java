@@ -27,7 +27,7 @@ public class AuthenticationController {
     }
 
     @PostMapping("/sign_up")
-    public ResponseEntity<?> signIn(@RequestBody SignUpRequest signUpRequest, HttpServletRequest request){
+    public ResponseEntity<?> signUp(@RequestBody SignUpRequest signUpRequest, HttpServletRequest request){
         System.out.println(request.getRequestURL());
         return userService.signUp(signUpRequest,request);
     }

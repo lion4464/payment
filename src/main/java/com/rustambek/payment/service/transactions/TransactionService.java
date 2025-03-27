@@ -45,20 +45,9 @@ public class TransactionService {
     public ResponseEntity<?> create(TransactionRequest transaction) {
         User user = userService.getCurrentUser();
         checkBalanceAndTransactionValue(transaction.getAmount(),user.getBalance());
-
         user.setBalance(user.getBalance() - transaction.getAmount());
-        Transaction model = Transaction.builder()
-                .userId(user.getId())
-                .amount(transaction.getAmount())
-                .paymentType(transaction.getPaymentType())
-                .status(PaymentStatusEnum.SUCCESS)
-                .paidAmount(transaction.getAmount())
-                .transactionDate(new Date())
-                .expiredDate(System.currentTimeMillis() + (invoiceExpiration * 1000))
-                .generateNumber(transactionRepository.nextValGenerateValue())
-                .build();
-            model.setTransactionNumber(generateNewTransactionNumber(prefix,model.getTransactionDate(),model.getGenerateNumber()));
-        Transaction savedTr = transactionRepository.save(model);
+        Transaction model = buildTransaction(transaction, user.getId());
+        Transaction savedTr = saveTransaction(model);
         userService.saveViaViod(user);
 
         //TODO we can save try catch block bz some problems exists during saving proccess
@@ -68,12 +57,7 @@ public class TransactionService {
         return ResponseEntity.ok(transactionMapper.toDto(savedTr));
     }
 
-    private void checkBalanceAndTransactionValue(Long reqAmount, Long balance) {
-        if (balance-reqAmount<0)
-            throw new BalanceNotEnoughException("insufficient balance");
-        if (reqAmount==0)
-            throw new BalanceNotEnoughException("amount must be greater than 0");
-    }
+
 
     private String generateNewTransactionNumber(String prefix, Date transactionDate, Long generateNumber) {
         DateFormat df = new SimpleDateFormat("yyyyMMdd");
@@ -108,4 +92,31 @@ public class TransactionService {
         Page<Transaction> allTransactions = transactionRepository.findAll(spec, pageable);
         return ResponseEntity.ok(transactionMapper.toDtoPage(allTransactions));
     }
+    private void checkBalanceAndTransactionValue(Long reqAmount, Long balance) {
+        if (balance-reqAmount<0)
+            throw new BalanceNotEnoughException("insufficient balance");
+        if (reqAmount==0)
+            throw new BalanceNotEnoughException("amount must be greater than 0");
+    }
+
+    private Transaction saveTransaction(Transaction tx) {
+        return transactionRepository.save(tx);
+    }
+
+    private Transaction buildTransaction(TransactionRequest transaction, UUID userId) {
+        long genVal = transactionRepository.nextValGenerateValue();
+        Date now = new Date();
+        return  Transaction.builder()
+                .userId(userId)
+                .amount(transaction.getAmount())
+                .paymentType(transaction.getPaymentType())
+                .status(PaymentStatusEnum.SUCCESS)
+                .paidAmount(transaction.getAmount())
+                .transactionDate(new Date())
+                .expiredDate(System.currentTimeMillis() + (invoiceExpiration * 1000))
+                .generateNumber(genVal)
+                .transactionNumber(generateNewTransactionNumber(prefix,now,genVal))
+                .build();
+    }
+
 }

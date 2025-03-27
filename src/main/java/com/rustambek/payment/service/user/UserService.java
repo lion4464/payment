@@ -23,7 +23,6 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
-import javax.validation.Valid;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -39,17 +38,11 @@ public class UserService {
         return userRepository.findByUsername(username).orElseThrow(() -> new RecordForbiddenException("User with username: " + username + " not found"));
     }
 
-    public ResponseEntity<?> signIn(SignInRequest signInRequest, HttpServletRequest request) {
-        Optional<User> optional = findFirstByUsername(signInRequest.getUsername());
-        if (optional.isPresent()) {
-            if (!passwordEncoder.matches(signInRequest.getPassword(), optional.get().getPassword())) {
-                throw new BadCredentialsException(signInRequest.getUsername());
-            }
-        } else {
-            throw new BadCredentialsException(signInRequest.getUsername());
-        }
-        return createAuthResponse(optional.get());
+    public ResponseEntity<?> signIn(SignInRequest request, HttpServletRequest httpRequest) {
+        User user = authenticateUser(request.getUsername(), request.getPassword());
+        return createAuthResponse(user);
     }
+
 
     private ResponseEntity<?> createAuthResponse(User user) {
         UserDetailsImpl userDetails = generateUserDetails(user);
@@ -65,25 +58,13 @@ public class UserService {
         return new UserDetailsImpl(userEntity);
     }
 
-    public ResponseEntity<?> signUp(SignUpRequest signUpRequest, HttpServletRequest request) {
-        checkExistsUsername(signUpRequest.getUsername());
-        User user = User.builder()
-                .fullName(signUpRequest.getFullName())
-                .role(UserRole.USER) // role static test project uchun
-                .username(signUpRequest.getUsername())
-                .password(passwordEncoder.encode(signUpRequest.getPassword()))
-                .balance(0L)
-                .build();
+    public ResponseEntity<?> signUp(SignUpRequest request, HttpServletRequest httpRequest) {
+        validateSignUpRequest(request);
+        User user = createUserFromRequest(request);
         userRepository.save(user);
         return createAuthResponse(user);
     }
 
-    private void checkExistsUsername(String username) {
-        Optional<User> optional = findFirstByUsername(username);
-        if (optional.isPresent()) {
-            throw new UserAlreadyExistException(username+" already exists");
-        }
-    }
 
     public User getCurrentUser() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
@@ -95,30 +76,70 @@ public class UserService {
         userRepository.save(user);
     }
 
-    public ResponseEntity<?> create(SignUpRequest requestDto, HttpServletRequest request) {
-        checkExistsUsername(requestDto.getUsername());
-        User user = User.builder()
-                .fullName(requestDto.getFullName())
-                .role(UserRole.USER) // role static test project uchun
-                .username(requestDto.getUsername())
-                .password(passwordEncoder.encode(requestDto.getPassword()))
-                .balance(requestDto.getBalance())
-                .build();
-        User savedModel = userRepository.save(user);
-        return ResponseEntity.ok(userMapper.toDto(savedModel));
-    }
-
     public ResponseEntity<?> getById(UUID id) {
         User model = findById(id);
         return ResponseEntity.ok(userMapper.toDto(model));
     }
 
-    private User findById(UUID id) {
-        return userRepository.findById(id).orElseThrow(() -> new RecordNotFoundException("User with id: " + id + " not found"));
+    public ResponseEntity<?> create(SignUpRequest requestDto, HttpServletRequest request) {
+        checkExistsUsername(requestDto.getUsername());
+        User user = createUserFromRequest(requestDto);
+        User savedModel = userRepository.save(user);
+        return ResponseEntity.ok(userMapper.toDto(savedModel));
     }
 
-    public ResponseEntity<?> update(UUID id, @Valid SignUpRequest requestDto) {
+
+    public ResponseEntity<?> update(UUID id, SignUpRequest requestDto) {
         User model = findById(id);
+        validateUpdate(requestDto,model);
+        userRepository.save(model);
+        return ResponseEntity.ok(userMapper.toDto(model));
+    }
+
+
+    public ResponseEntity<?> pageable(Pageable pageable) {
+        Page<User> all = userRepository.findAll(pageable);
+        return ResponseEntity.ok(userMapper.toDtoPage(all));
+    }
+
+    public ResponseEntity<?> delete(UUID id) {
+        existUserById(id);
+        userRepository.deleteById(id);
+        return ResponseEntity.ok("SUCCESS");
+
+    }
+
+    private Boolean existUserById(UUID id) {
+        if (!userRepository.existsById(id)) {
+            throw new RecordNotFoundException("User with id: " + id + " not found");
+        }
+        return true;
+    }
+    private void validateSignUpRequest(SignUpRequest request) {
+        checkExistsUsername(request.getUsername());
+    }
+
+    private User createUserFromRequest(SignUpRequest request) {
+        return User.builder()
+                .fullName(request.getFullName())
+                .role(UserRole.USER)
+                .username(request.getUsername())
+                .password(passwordEncoder.encode(request.getPassword()))
+                .balance(0L)
+                .build();
+    }
+
+
+    private void checkExistsUsername(String username) {
+        Optional<User> optional = findFirstByUsername(username);
+        if (optional.isPresent()) {
+            throw new UserAlreadyExistException(username+" already exists");
+        }
+    }
+
+
+
+    private void validateUpdate(SignUpRequest requestDto, User model) {
         if (requestDto.getFullName() != null)
             model.setFullName(requestDto.getFullName());
         if (requestDto.getUsername() != null)
@@ -127,22 +148,21 @@ public class UserService {
             model.setPassword(passwordEncoder.encode(requestDto.getPassword()));
         if (requestDto.getBalance() != null)
             model.setBalance(requestDto.getBalance());
-        userRepository.save(model);
-        return ResponseEntity.ok(userMapper.toDto(model));
     }
 
-    public ResponseEntity<?> pageable(Pageable pageable) {
-        Page<User> all = userRepository.findAll(pageable);
-        return ResponseEntity.ok(userMapper.toDtoPage(all));
+
+    private User findById(UUID id) {
+        return userRepository.findById(id).orElseThrow(() -> new RecordNotFoundException("User with id: " + id + " not found"));
     }
 
-    public ResponseEntity<?> delete(UUID id) {
-        if(userRepository.existsById(id)){
-            userRepository.deleteById(id);
-        }else {
-            throw new RecordNotFoundException("User with id: " + id + " not found");
+    private User authenticateUser(String username, String password) {
+        User user = findFirstByUsername(username)
+                .orElseThrow(() -> new BadCredentialsException("Invalid credentials"));
+
+        if (!passwordEncoder.matches(password, user.getPassword())) {
+            throw new BadCredentialsException("Invalid credentials");
         }
-        return ResponseEntity.ok("SUCCESS");
 
+        return user;
     }
 }
