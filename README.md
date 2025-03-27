@@ -16,7 +16,7 @@ This project is a RESTful API service designed for transaction management.
    git clone https://github.com/lion4464/payment.git
 2. 
    ```bash 
-    cd payment```
+    cd payment
 3. migrate sql scripts
 
 ## 🐘 PostgreSQL SQL script
